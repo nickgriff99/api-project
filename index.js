@@ -32,7 +32,7 @@ const createArtCard = (obj) => {
   return artCard;
 };
 
-searchButton.addEventListener('click', async () => {
+const performSearch = async () => {
   const query = searchInput.value.trim();
   if (!query) return;
 
@@ -59,5 +59,13 @@ searchButton.addEventListener('click', async () => {
   } catch (err) {
     console.error(err);
     setResultsContent(MESSAGES.ERROR);
+  }
+};
+
+searchButton.addEventListener('click', performSearch);
+
+searchInput.addEventListener('keydown', (event) => {
+  if (event.key === 'Enter') {
+    performSearch();
   }
 });
