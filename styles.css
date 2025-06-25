@@ -35,3 +35,10 @@ input, button {
   max-width: 100%;
   border-radius: 4px;
 }
+
+.container .footer-container {
+  margin-top: 40px;
+  bottom: 0;
+  text-align: center;
+  color: #888;
+}
