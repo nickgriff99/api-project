@@ -44,6 +44,8 @@ body {
 
 .nav ul li {
   margin: 0 15px;
+  line-height: 2rem;
+  letter-spacing: 2px;
 }
 
 .nav ul li a {
@@ -126,7 +128,7 @@ input, button {
   align-items: center;
 }
 
-#results .art-card {
+#results .emoji-card {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -138,19 +140,19 @@ input, button {
   max-height: 425px;
 }
 
-.art-card-header {
+.emoji-card-header {
   text-align: center;
   letter-spacing: 1.2px;
   margin: 10px;
 }
 
-.art-card-header h3 {
+.emoji-card-header h3 {
   font-size: 1.2rem;
   margin: 0;
   color: #f5f4ed;
 }
 
-.art-card-image {
+.emoji-card-image {
   width: 100%;
   display: flex;
   justify-content: center;
@@ -159,7 +161,7 @@ input, button {
   margin-bottom: 10px;
 }
 
-.art-card img {
+.emoji-card img {
   max-width: 100%;
   max-height: 275px;
   border-radius: 4px;
