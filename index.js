@@ -1,18 +1,23 @@
 fetch('https://emojihub.yurace.pro/api/all')
   .then(response => response.json())
   .then(data => console.log(data))
-  .catch(error => console.error('Error:', error));
+  .catch(err => console.error('Error:', err));
 
 const apiBaseUrl = 'https://emojihub.yurace.pro/api/all';
 const messages = {
-  LOADING: 'Loading...',
-  NO_RESULTS: 'No results found.',
-  ERROR: 'An error occurred.'
+  loading: 'Loading...',
+  noResults: 'No results found.',
+  err: 'An error occurred.'
 };
 
 const searchInput = document.getElementById('searchInput');
 const searchButton = document.getElementById('searchButton');
 const resultsContainer = document.getElementById('results');
+let allEmojis = [];
+let filteredEmojis = [];
+let currentIndex = 0;
+const pageSize = 30;
+const loadMoreButton = document.getElementById('loadMoreButton');
 
 const setResultsContent = (content) => {
   resultsContainer.innerHTML = content;
@@ -33,44 +38,66 @@ const createEmojiCard = (emojiObj) => {
   return card;
 };
 
+const renderEmojis = (emojiArray, reset = false) => {
+  if (reset) {
+    resultsContainer.innerHTML = '';
+    currentIndex = 0;
+  }
+  const nextBatch = emojiArray.slice(currentIndex, currentIndex + pageSize);
+  nextBatch.forEach(emojiObj => {
+    const card = createEmojiCard(emojiObj);
+    resultsContainer.appendChild(card);
+  });
+  currentIndex += pageSize;
+  if (currentIndex < emojiArray.length) {
+    loadMoreButton.style.display = 'block';
+  } else {
+    loadMoreButton.style.display = 'none';
+  }
+};
+
 const loadAllEmojis = async () => {
-  setResultsContent(messages.LOADING);
+  setResultsContent(messages.loading);
   try {
     const res = await fetch(apiBaseUrl);
-    const emojis = await res.json();
-
-    resultsContainer.innerHTML = '';
-    emojis.slice(0, 30).forEach(emojiObj => {
-      const card = createEmojiCard(emojiObj);
-      resultsContainer.appendChild(card);
-    });
+    allEmojis = await res.json();
+    filteredEmojis = allEmojis;
+    renderEmojis(filteredEmojis, true);
   } catch (err) {
     console.error(err);
-    setResultsContent(messages.ERROR);
+    setResultsContent(messages.err);
+  }
+};
+
+const fetchAllEmojis = async () => {
+  if (!allEmojis.length) {
+    const res = await fetch(apiBaseUrl);
+    allEmojis = await res.json();
   }
 };
 
 const performSearch = async () => {
   const query = searchInput.value.trim().toLowerCase();
-  setResultsContent(messages.LOADING);
+  setResultsContent(messages.loading);
   try {
-    const res = await fetch(apiBaseUrl);
-    const emojis = await res.json();
-    const filtered = emojis.filter(e => e.name.toLowerCase().includes(query));
-    if (filtered.length === 0) {
-      setResultsContent(messages.NO_RESULTS);
+    await fetchAllEmojis();
+    filteredEmojis = allEmojis.filter(e => e.name.toLowerCase().includes(query));
+    if (filteredEmojis.length === 0) {
+      setResultsContent(messages.noResults);
+      loadMoreButton.style.display = 'none';
       return;
     }
-    resultsContainer.innerHTML = '';
-    filtered.forEach(emojiObj => {
-      const card = createEmojiCard(emojiObj);
-      resultsContainer.appendChild(card);
-    });
+    renderEmojis(filteredEmojis, true);
   } catch (err) {
     console.error(err);
-    setResultsContent(messages.ERROR);
+    setResultsContent(messages.err);
+    loadMoreButton.style.display = 'none';
   }
 };
+
+loadMoreButton.addEventListener('click', () => {
+  renderEmojis(filteredEmojis);
+});
 
 window.addEventListener('DOMContentLoaded', loadAllEmojis);
 searchButton.addEventListener('click', performSearch);
